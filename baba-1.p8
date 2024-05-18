@@ -4,22 +4,21 @@ __lua__
 --baba
 
 function _init()
---spt,text,type,move,touch,color
-tile={
-{65,false,"flag",0,"win",{10,10}},
-{64,false,"wall","stop",0,{5,5}},
-{66,false,"rock","push",0,{4,4}},
-{32,true,"baba","push",0,{2,8}},
-{33,true,"wall","push",0,{1,5}},
-{34,true,"flag","push",0,{4,10}},
-{35,true,"rock","push",0,{2,4}},
-{36,true,"is","push",0,{5,7}},
-{48,true,"you","push",0,{2,8}},
-{49,true,"stop","push",0,{3,11}},
-{50,true,"win","push",0,{4,10}},
-{51,true,"push","push",0,{2,4}},
-{193,false,"baba","you","you",{7,7}}
-
+--spt |	is_text|type  |	on_move|on_touch|color
+tile={	
+{65,	false,	"flag", 0,		"win",	{10,10}},
+{64,	false,	"wall", "stop",	0,		{5,5}},
+{66,	false,	"rock", "push",	0,		{4,4}},
+{32,	true,	"baba", "push",	0,		{2,8}},
+{33,	true,	"wall", "push",	0,		{1,5}},
+{34,	true,	"flag", "push",	0,		{4,10}},
+{35,	true,	"rock", "push",	0,		{2,4}},
+{36,	true,	"is", 	"push",	0,		{5,7}},
+{48,	true,	"you", 	"push",	0,		{2,8}},
+{49,	true,	"stop",	"push",	0,		{3,11}},
+{50,	true,	"win", 	"push",	0,		{4,10}},
+{51,	true,	"push", "push",	0,		{2,4}},
+{193,	false,	"baba", "you",	"you",	{7,7}}
 }
 
 obj={}
@@ -45,19 +44,18 @@ function update_game()
 	for b in all(obj) do
 		b:control(obj)
 	end
-
 end
 -->8
 --draw
+
 
 function draw_game()
 	cls()
 	map()
 	for b in all(obj) do
 		b:babadir(obj)
+		b:draw(obj)
 	end
-	foreach(obj,draw_objs)
-
 end
 
 -->8
@@ -68,13 +66,6 @@ pal(1,0)
 pal(5,_c)
 spr(_spr,_x*8,_y*8)
 pal()
-end
-
-
-
-
-function draw_objs(_obs)
-	drawspr(_obs.spr,_obs.x,_obs.y,_obs.color[2])
 end
 
 function find_objs()
@@ -89,6 +80,7 @@ function find_objs()
 	end
 end
 
+
 function make_obj(_x,_y,_t)
 	local o = {}
 	o.x=_x
@@ -101,33 +93,39 @@ function make_obj(_x,_y,_t)
 	o.color=_t[6]
 
 	o.control=function(self)
-			if self.move == "you" then
-			local dirx={-1,1,0,0}
-			local diry={0,0,-1,1}
-				for i=0,3 do
-					if btnp(i) then
-						self.x+=dirx[i+1]
-						self.y+=diry[i+1]
-						sfx(60)
-						return
-					end
-				end
-			end
-		end
-
-		o.babadir=function(self)
-			if self.type == "baba" and
-				 self.move == "you" then
-				for i=0,3 do
-					if btnp(i) then
-						self.spr=192+i
+		local dirx={-1,1,0,0}
+		local diry={0,0,-1,1}
+		if self.move == "you" then
+			for i=0,3 do
+				if btnp(i) then
+					self.x+=dirx[i+1]
+					self.y+=diry[i+1]
+					sfx(60)
 					return
-					end
 				end
 			end
 		end
+	end
+
+	o.babadir=function(self)
+		if self.type == "baba" and
+				self.move == "you" then
+			for i=0,3 do
+				if btnp(i) then
+					self.spr=192+i
+				return
+				end
+			end
+		end
+	end
 
 		add(obj,o)
+	o.draw=function(self)
+		drawspr(self.spr,self.x,self.y,self.color[2])
+		if self.touch == "win" then
+			print("win",self.x,self.y)
+		end
+	end
 end
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
